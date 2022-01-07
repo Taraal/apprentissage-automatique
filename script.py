@@ -35,23 +35,29 @@ def train_jiant(config):
 	run.run_simple(args)
 	
 	val_metrics = py_io.read_json(os.path.join(EXP_DIR, "runs", 'simple', "val_metrics.json"))
-	tune.report(major=val_metrics[task]["metrics"]["major"])
+	tune.report(acc=val_metrics[task]["metrics"]["minor"]["acc"]) # Changer ici le nom et l'empaclement de la métrique
 
 search_space = {
-	"lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand()))
+	"lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand())) # Changer ici les valeurs possibles pour LR
 }
 
 
 analysis = tune.run(train_jiant,
-	metric="major",
+	metric="acc", # Changer ici le nom de la métrique
 	mode="max",
-	config=search_space, num_samples=1,
+	config=search_space,
+	num_samples=2, # Changer ici le nb de trials 
 	resources_per_trial={"gpu": 1, "cpu": 13})
 
 dfs = analysis.trial_dataframes
 # print([d.mean_accuracy for d in dfs.values()])
-#print(dfs)
 print("#######")
 print("BEST CONFIG : ")
 print(analysis.best_config)
 print("#######")
+
+print()
+print("######")
+print("BEST RESULT : ")
+print(analysis.best_result)
+print("######")
