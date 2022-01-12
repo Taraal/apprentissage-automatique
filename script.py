@@ -14,10 +14,10 @@ tasks = ["rte", "wic", "wsc", "mrpc"]
 
 #downloader.download_data(tasks, f"{EXP_DIR}/tasks")
 
-task = "mrpc"
+task = "rte"
 #for task in tasks:
 def train_jiant(config):
-	downloader.download_data(["mrpc"], f"{EXP_DIR}/tasks")
+	downloader.download_data([task], f"{EXP_DIR}/tasks")
 
 # Set up the arguments for the Simple API
 	args = run.RunConfiguration(
@@ -26,8 +26,8 @@ def train_jiant(config):
 	   data_dir=f"{EXP_DIR}/tasks",
 	   hf_pretrained_model_name_or_path="roberta-base",
 	   tasks=task,
-	   train_batch_size=16,
-		num_train_epochs=3,
+	   train_batch_size=config["batch_size"],
+		num_train_epochs=config["epochs"],
 		learning_rate=config["lr"]
 	)
 
@@ -38,7 +38,9 @@ def train_jiant(config):
 	tune.report(acc=val_metrics[task]["metrics"]["minor"]["acc"]) # Changer ici le nom et l'empaclement de la métrique
 
 search_space = {
-	"lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand())) # Changer ici les valeurs possibles pour LR
+	"lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand())), # Changer ici les valeurs possibles pour LR
+	"batch_size": tune.choice([4, 8, 16, 32, 64]),
+	"epochs": tune.choice([1, 3, 6])
 }
 
 
@@ -46,7 +48,7 @@ analysis = tune.run(train_jiant,
 	metric="acc", # Changer ici le nom de la métrique
 	mode="max",
 	config=search_space,
-	num_samples=2, # Changer ici le nb de trials 
+	num_samples=15, # Changer ici le nb de trials 
 	resources_per_trial={"gpu": 1, "cpu": 13})
 
 dfs = analysis.trial_dataframes
