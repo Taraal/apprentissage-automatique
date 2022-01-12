@@ -26,9 +26,9 @@ def train_jiant(config):
 	   data_dir=f"{EXP_DIR}/tasks",
 	   hf_pretrained_model_name_or_path="roberta-base",
 	   tasks=task,
-	   train_batch_size=config["batch_size"],
-		num_train_epochs=config["epochs"],
-		learning_rate=config["lr"]
+	   train_batch_size=16, # default = 16
+		num_train_epochs=config["epochs"], # default = 3
+		learning_rate=1e-5 # default = 1e-5
 	)
 
 	# Run!
@@ -48,7 +48,7 @@ analysis = tune.run(train_jiant,
 	metric="acc", # Changer ici le nom de la métrique
 	mode="max",
 	config=search_space,
-	num_samples=15, # Changer ici le nb de trials 
+	num_samples=5, # Changer ici le nb de trials 
 	resources_per_trial={"gpu": 1, "cpu": 13})
 
 dfs = analysis.trial_dataframes
