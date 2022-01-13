@@ -45,9 +45,9 @@ def train_jiant(config):
 	tune.report(aggregated=val_metrics["aggregated"]) # Changer ici le nom et l'empaclement de la métrique
 
 search_space = {
-	"lr": tune.grid_search([1e-5]),  #tune.sample_from(lambda spec: 10**(-10 * np.random.rand())), # Changer ici les valeurs possibles pour LR
-	"batch_size": tune.grid_search([4]),
-	"epochs": tune.grid_search([3, 4, 5, 6])
+	"lr": tune.grid_search([1e-5, 5e-5, 5e-6]),  #tune.sample_from(lambda spec: 10**(-10 * np.random.rand())), # Changer ici les valeurs possibles pour LR
+	"batch_size": tune.grid_search([4, 8, 16]),
+	"epochs": tune.grid_search([2, 3, 4])
 }
 
 
